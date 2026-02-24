@@ -3,12 +3,14 @@
 A real-time **XY Oscilloscope / Vectorscope** running directly in your browser.  
 Visualize audio signals from files or microphone using Web Audio API.
 
+![preview](preview.jpg)
 ![preview](preview.png)
-
 ---
 
 ## Live Demo
 Try it live in your browser: [Click here](https://gibsy.github.io/OscilloScope-XY-WEB/)
+
+You can try this with example sounds from repo
 
 ## Credits
 
