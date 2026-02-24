@@ -16,230 +16,219 @@ Modified by: Gibsy
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Oscilloscope</title>
-	<meta charset="utf-8"/>
-	<style>
-body {
-	background-color: #222;
-	color: #EEE;
-	font-family: sans-serif;
-}
-
-#ui_div {
-	display:flex;
-	flex-direction: row;
-}
-
-@media (max-aspect-ratio: 5/4) {
-    #ui_div {
-		flex-direction: column !important;
-    }
-}
-
-#scope_div, #control_panel {
-	height: max-content;
-	max-height: 95vh;
-	margin: 5px;
-}
-#scope_div { width: 100%; }
-#control_panel { width: calc(min(max-content, 40vw)); }
-
-#XYscope {
-	display: block;
-	margin: auto;
-	border: 3px solid #0F0;
-	max-height: 95vh;
-}
-
-.control_mode { display: none; }
-
-button, input, select {
-	background-color: #333;
-	color: #FFF;
-	border: solid #AAA 2px;
-	margin: 2px;
-	border-radius: 5px;
-}
-
-.fullscreen_block {
-	display: flex;
-	justify-content:center;
-	align-items:center;
-	background: black;
-	
-	z-index: 99;
-	position: fixed;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	right: 0;
-	width: 100%;
-	height: 100%;
-}
-
-.option_line {
-	width: 100%;
-	white-space: nowrap;
-}
-
-#start_button {
-	max-width: 90vw;
-	font-size: 3em;
-}
-</style>
+    <title>Oscilloscope</title>
+    <meta charset="utf-8"/>
+    <style>
+body { background-color:#222; color:#EEE; font-family:sans-serif; }
+#ui_div { display:flex; flex-direction:row; }
+@media (max-aspect-ratio:5/4){ #ui_div{ flex-direction:column !important; } }
+#scope_div,#control_panel { height:max-content; max-height:95vh; margin:5px; }
+#scope_div { width:100%; }
+#control_panel { width:calc(min(max-content,40vw)); }
+#XYscope { display:block; margin:auto; border:3px solid #0F0; max-height:95vh; }
+.control_mode { display:none; }
+button,input,select { background-color:#333; color:#FFF; border:solid #AAA 2px; margin:2px; border-radius:5px; }
+.fullscreen_block { display:flex; justify-content:center; align-items:center; background:black;
+    z-index:99; position:fixed; top:0; left:0; bottom:0; right:0; width:100%; height:100%; }
+.option_line { width:100%; white-space:nowrap; }
+#start_button { max-width:90vw; font-size:3em; }
+    </style>
 </head>
 <body>
-	<div id="ui_div">
-		<div id="scope_div">
-			<canvas id="XYscope" width=256 height=256></canvas>
-		</div>
-
-		<div id="control_panel">
-			<h1>Oscilloscope</h1>
-			<hr>
-			<div class="fullscreen_block"> <button id="start_button" onclick="ac.resume(); this.parentElement.remove();">CLICK TO START</button> <noscript><br>JS Required</noscript></div>		
-			<span class="option_line"><label for="time_base">Sampling Time: </label><input type="range" min="8" value="13" max="15" step="1" onchange="time_base_text.innerText=aAnL.fftSize=aAnR.fftSize=Math.pow(2,this.value);" id="time_base" autocomplete="off"> <span id="time_base_text">8192</span></span>
-			<br>
-			<span class="option_line"><label for="audio_gain">Gain: </label><input type="range" min="0.1" value="1" max="4" step="0.1" onchange="audio_gain_text.innerText=aG.gain.value=this.value;" id="audio_gain" autocomplete="off"> <span id="audio_gain_text">1</span></span>
-			<br>
-			<span class="option_line"><label for="swap_channels">Swap Channels: </label> <input type="checkbox" id="swap_channels" onchange="swapLR(this.checked);" autocomplete="off"></span>
-			<br>
-			<span class="option_line"><label for="phosphor_decay">Phosphor-like Decay: </label> <input type="checkbox" id="phosphor_decay" onchange="phosphor_decay_speed.disabled = !(phosD = this.checked);" autocomplete="off"></span>
-			<br>
-			<span class="option_line"><label for="phosphor_decay_speed">Phosphor Decay Speed: </label><input type="range" min="0.01" value="0.1" max="0.25" step="0.01" onchange="phosphor_decay_speed_text.innerText=phosDS=this.value;" id="phosphor_decay_speed" autocomplete="off" disabled> <span id="phosphor_decay_speed_text">0.1</span></span>
-			<br>
-			<label for="draw_scale">Scale: </label><select id="draw_scale" name="draw_scale" type="select" autocomplete="off">
-				<option value="none">None</option>
-				<option value="grid">Grid</option>
-			</select>
-			<br>
-			<br>
-			<span class="option_line"><label for="playback_vol">Playback Volume: </label><input type="range" min="0" value="1" max="2" step="0.1" onchange="playback_vol_text.innerText=aGO.gain.value=this.value;" id="playback_vol" autocomplete="off"> <span id="playback_vol_text">1</span></span>
-			<br>
-			<label for="input_mode">Mode: </label><select onchange="selSource();" id="input_mode" name="input_mode" type="select" autocomplete="off">
-				<option value="file">File</option>
-				<option value="mic">Microphone</option>
-			</select>
-			<br>
-			
-			<div class="control_mode" id="file_control">
-				<input type="file" onchange="fileSel(this);" style="max-width: 20vw;" id="file_sel" autocomplete="off"><br>
-				<audio id="file_player" controls loop></audio><br>
-			</div>
-			
-			<div class="control_mode" id="mic_control"></div>
-		</div>
-	</div>
-
-	<script>
-//canvas
+    <div id="ui_div">
+        <div id="scope_div">
+            <canvas id="XYscope" width=256 height=256></canvas>
+        </div>
+        <div id="control_panel">
+            <h1>Oscilloscope</h1>
+            <hr>
+            <div class="fullscreen_block">
+                <button id="start_button" onclick="startAudio();">CLICK TO START</button>
+                <noscript><br>JS Required</noscript>
+            </div>
+            <span class="option_line">
+                <label for="time_base">Sampling Time: </label>
+                <input type="range" min="8" value="13" max="15" step="1"
+                    oninput="updateTimeBase(this.value);" id="time_base" autocomplete="off">
+                <span id="time_base_text">8192</span>
+            </span><br>
+            <span class="option_line">
+                <label for="audio_gain">Gain: </label>
+                <input type="range" min="0.1" value="1" max="4" step="0.1"
+                    oninput="audio_gain_text.innerText = visualGain = parseFloat(this.value);"
+                    id="audio_gain" autocomplete="off">
+                <span id="audio_gain_text">1</span>
+            </span><br>
+            <span class="option_line">
+                <label for="swap_channels">Swap Channels: </label>
+                <input type="checkbox" id="swap_channels" onchange="swapLR(this.checked);" autocomplete="off">
+            </span><br>
+            <span class="option_line">
+                <label for="phosphor_decay">Phosphor-like Decay: </label>
+                <input type="checkbox" id="phosphor_decay"
+                    onchange="phosD=this.checked; phosphor_decay_speed.disabled=!this.checked; phosDS=parseFloat(phosphor_decay_speed.value);"
+                    autocomplete="off">
+            </span><br>
+            <span class="option_line">
+                <label for="phosphor_decay_speed">Phosphor Decay Speed: </label>
+                <input type="range" min="0.01" value="0.24" max="0.25" step="0.01"
+                    oninput="phosphor_decay_speed_text.innerText = phosDS = parseFloat(this.value);"
+                    id="phosphor_decay_speed" autocomplete="off" disabled>
+                <span id="phosphor_decay_speed_text">0.24</span>
+            </span><br>
+            <span class="option_line">
+                <label for="playback_vol">Playback Volume: </label>
+                <input type="range" min="0" value="0.1" max="2" step="0.1"
+                    oninput="playback_vol_text.innerText = aGO.gain.value = parseFloat(this.value);"
+                    id="playback_vol" autocomplete="off">
+                <span id="playback_vol_text">0.1</span>
+            </span><br>
+            <label for="input_mode">Mode: </label>
+            <select onchange="selSource();" id="input_mode" name="input_mode" autocomplete="off">
+                <option value="file">File</option>
+                <option value="mic">Microphone</option>
+            </select><br>
+            <div class="control_mode" id="file_control">
+                <input type="file" onchange="fileSel(this);" style="max-width:20vw;" id="file_sel" autocomplete="off"><br>
+                <audio id="file_player" loop></audio>
+                    <div style="display:flex; align-items:center; gap:8px; max-width:300px;">
+                        <button id="play_btn">▶</button>
+                        <input type="range" id="seek_bar" value="0" min="0" max="100" step="0.1" style="flex:1;">
+                        <span id="time_label">0:00 / 0:00</span>
+                    </div>
+            </div>
+            <div class="control_mode" id="mic_control"></div>
+        </div>
+    </div>
+    <script>
 const cnv = document.getElementById('XYscope');
-const vc = cnv.getContext('2d');
-vc.lineWidth = 1;
-
+const vc  = cnv.getContext('2d');
+const ac  = new (window.AudioContext || window.webkitAudioContext)();
+const aS  = ac.createChannelSplitter(2);
+const aGO = ac.createGain();
+aGO.gain.value = 0.1;
+var aAnL = ac.createAnalyser(); aAnL.fftSize = 8192;
+var aAnR = ac.createAnalyser(); aAnR.fftSize = 8192;
+aS.connect(aAnL, 0);
+aS.connect(aAnR, 1);
+const aM = ac.createChannelMerger(2);
+aS.connect(aM, 0, 0);
+aS.connect(aM, 1, 1);
+aM.connect(aGO);
+aGO.connect(ac.destination);
+var phosD      = false;
+var phosDS     = 0.24;
+var visualGain = 1.0;
+function startAudio() {
+    ac.resume();
+    document.querySelector('.fullscreen_block').remove();
+}
+function updateTimeBase(val) {
+    const size = Math.pow(2, parseInt(val));
+    time_base_text.innerText = size;
+    aAnL.fftSize = size;
+    aAnR.fftSize = size;
+}
+const aFP = document.getElementById("file_player");
+const aPM = ac.createMediaElementSource(aFP);
+function fileSel(e) {
+    const fR = new FileReader();
+    fR.addEventListener('load', ev => { aFP.src = ev.target.result; });
+    fR.readAsDataURL(e.files[0]);
+}
+var aMi;
+function getMic() {
+    playback_vol.value = 0;
+    aGO.gain.value = 0;
+    playback_vol_text.innerText = 0;
+    try { aMi.disconnect(); } catch {}
+    navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation:false, autoGainControl:false, noiseSuppression:false, channelCount:2 }
+    })
+    .then(stream => { aMi = ac.createMediaStreamSource(stream); aMi.connect(aS); })
+    .catch(err   => { alert(err); });
+}
+function selSource() {
+    try { aPM.disconnect(); } catch {}
+    try { aMi.disconnect(); } catch {}
+    file_control.style.display = "none";
+    mic_control.style.display  = "none";
+    switch (input_mode.value) {
+        case "file": file_control.style.display = "inline-block"; aPM.connect(aS); break;
+        case "mic":  mic_control.style.display  = "inline-block"; getMic(); break;
+    }
+}
+selSource();
+function swapLR(on) {
+    aS.disconnect();
+    if (on) { aS.connect(aAnL,1); aS.connect(aAnR,0); }
+    else    { aS.connect(aAnL,0); aS.connect(aAnR,1); }
+    aS.connect(aM, 0, 0);
+    aS.connect(aM, 1, 1);
+}
+function mapfloat(x, in_min, in_max, out_min, out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 function resChange() {
-	let m256 = scope_div.clientWidth - (scope_div.clientWidth % 256); // integer scaling
-	cnv.width = m256;
-	cnv.height = m256;
+    const m256 = scope_div.clientWidth - (scope_div.clientWidth % 256);
+    cnv.width  = m256;
+    cnv.height = m256;
 }
 resChange();
 window.addEventListener('resize', resChange);
-
-var phosD = false;
-var phosDS = 0.1;
-
-//audio setup
-const ac = new (window.AudioContext || window.webkitAudioContext)();
-const aG = ac.createGain();
-const aS = ac.createChannelSplitter(2);
-const aGO = ac.createGain();
-aG.connect(aS);
-var aAnL = ac.createAnalyser(); aAnL.fftSize = 8192; aS.connect(aAnL,0);
-var aAnR = ac.createAnalyser(); aAnR.fftSize = 8192; aS.connect(aAnR,1);
-const aM = ac.createChannelMerger(2);
-aAnL.connect(aM,0,0); aAnR.connect(aM,0,1);
-aM.connect(aGO); aGO.connect(ac.destination);
-
-//file source
-const aFP = document.getElementById("file_player");
-const aPM = ac.createMediaElementSource(aFP);
-function fileSel(e){
-	const fR = new FileReader();
-	fR.addEventListener('load', (event)=>{aFP.src = event.target.result;});
-	fR.readAsDataURL(e.files[0]);
-}
-
-//microphone
-var aMi;
-function getMic(){
-	playback_vol.value = 0; playback_vol.onchange();
-	try {aMi.disconnect();} catch {}
-	navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,autoGainControl:false,noiseSuppression:false,channelCount:2}})
-	.then(stream=>{aMi = ac.createMediaStreamSource(stream); aMi.connect(aG);})
-	.catch(err=>{alert(err);});
-}
-
-//source selection
-function selSource(){
-	aPM.disconnect(); try{aMi.disconnect();}catch{}
-	file_control.style.display="none"; mic_control.style.display="none";
-	switch(input_mode.value){
-		case "file": file_control.style.display="inline-block"; aPM.connect(aG); break;
-		case "mic": mic_control.style.display="inline-block"; getMic(); break;
-	}
-}
-selSource();
-
-//swap channels
-function swapLR(on){
-	aS.disconnect();
-	if(on){ aS.connect(aAnL,1); aS.connect(aAnR,0); }
-	else { aS.connect(aAnL,0); aS.connect(aAnR,1); }
-}
-
-//map function
-function mapfloat(x,in_min,in_max,out_min,out_max){
-	return (x-in_min)*(out_max-out_min)/(in_max-in_min)+out_min;
-}
-
-//drawing
-function drawBuf(){
-	vc.fillStyle = phosD ? 'rgba(0,0,0,'+phosDS+')' : 'black';
-	vc.fillRect(0,0,cnv.width,cnv.height);
-
-	const bLen = Math.max(aAnL.frequencyBinCount,aAnR.frequencyBinCount);
-	let datL = new Uint8Array(bLen);
-	let datR = new Uint8Array(bLen);
-	aAnL.getByteTimeDomainData(datL);
-	aAnR.getByteTimeDomainData(datR);
-
-	// draw scale
-	vc.lineWidth = 1;
-	if(draw_scale.value === "grid" || draw_scale.value === "both"){
-		vc.strokeStyle = "rgba(0,255,0,0.9)"; vc.lineWidth = 0.3; vc.beginPath();
-		const step = cnv.width/16;
-		for(let i=0;i<=16;i++){
-			vc.moveTo(i*step,0); vc.lineTo(i*step,cnv.height);
-			vc.moveTo(0,i*step); vc.lineTo(cnv.width,i*step);
-		}
-		vc.stroke();
-	}
-
-	// draw audio signal
-	for(let i=0;i<bLen;i++){
-		let x = mapfloat(datL[i],0,255,0,cnv.width);
-		let y = mapfloat(datR[i],0,255,cnv.height,0);
-		let grad = vc.createRadialGradient(x,y,0,x,y,2);
-		grad.addColorStop(0,"rgba(0,255,0,1)");
-		grad.addColorStop(1,"rgba(0,255,0,0)");
-		vc.fillStyle = grad;
-		vc.fillRect(x-1,y-1,3,3);
-	}
-
-	requestAnimationFrame(drawBuf);
+function drawBuf() {
+    vc.fillStyle = phosD ? `rgba(0,0,0,${phosDS})` : 'black';
+    vc.fillRect(0, 0, cnv.width, cnv.height);
+    const bLen = Math.max(aAnL.frequencyBinCount, aAnR.frequencyBinCount);
+    const datL = new Uint8Array(bLen);
+    const datR = new Uint8Array(bLen);
+    aAnL.getByteTimeDomainData(datL);
+    aAnR.getByteTimeDomainData(datR);
+    const center = 128;
+    for (let i = 0; i < bLen; i++) {
+        const scaledL = center + (datL[i] - center) * visualGain;
+        const scaledR = center + (datR[i] - center) * visualGain;
+        const x = mapfloat(scaledL, 0, 255, 0, cnv.width);
+        const y = mapfloat(scaledR, 0, 255, cnv.height, 0);
+        const grad = vc.createRadialGradient(x, y, 0, x, y, 2);
+        grad.addColorStop(0, 'rgba(0,255,0,1)');
+        grad.addColorStop(1, 'rgba(0,255,0,0)');
+        vc.fillStyle = grad;
+        vc.fillRect(x - 1, y - 1, 3, 3);
+    }
+    requestAnimationFrame(drawBuf);
 }
 drawBuf();
-
-	</script>
+const playBtn   = document.getElementById("play_btn");
+const seekBar   = document.getElementById("seek_bar");
+const timeLabel = document.getElementById("time_label");
+function formatTime(sec) {
+    if (!sec || isNaN(sec)) return "0:00";
+    const m = Math.floor(sec / 60);
+    const s = Math.floor(sec % 60);
+    return m + ":" + (s < 10 ? "0" + s : s);
+}
+playBtn.addEventListener("click", () => {
+    if (aFP.paused) {
+        aFP.play();
+        playBtn.textContent = "⏸";
+    } else {
+        aFP.pause();
+        playBtn.textContent = "▶";
+    }
+});
+aFP.addEventListener("loadedmetadata", () => {
+    seekBar.max = aFP.duration;
+    timeLabel.textContent = `0:00 / ${formatTime(aFP.duration)}`;
+});
+aFP.addEventListener("timeupdate", () => {
+    seekBar.value = aFP.currentTime;
+    timeLabel.textContent =
+        `${formatTime(aFP.currentTime)} / ${formatTime(aFP.duration)}`;
+});
+seekBar.addEventListener("input", () => {
+    aFP.currentTime = seekBar.value;
+});
+    </script>
 </body>
 </html>
