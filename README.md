@@ -4,7 +4,7 @@ A real-time **XY Oscilloscope / Vectorscope** running directly in your browser.
 Visualize audio signals from files or microphone using Web Audio API.
 
 ![preview](preview.jpg)
-![preview](preview.png)
+![preview](newpreview.jpg)
 ---
 
 ## Live Demo
