@@ -95,7 +95,7 @@ button, input, select {
 		</div>
 
 		<div id="control_panel">
-			<h1>Oscilloscope / Vectorscope</h1>
+			<h1>Oscilloscope</h1>
 			<hr>
 			<div class="fullscreen_block"> <button id="start_button" onclick="ac.resume(); this.parentElement.remove();">CLICK TO START</button> <noscript><br>JS Required</noscript></div>		
 			<span class="option_line"><label for="time_base">Sampling Time: </label><input type="range" min="8" value="13" max="15" step="1" onchange="time_base_text.innerText=aAnL.fftSize=aAnR.fftSize=Math.pow(2,this.value);" id="time_base" autocomplete="off"> <span id="time_base_text">8192</span></span>
